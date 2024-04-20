@@ -8,7 +8,7 @@ public class Spring6RestMvcApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Spring6RestMvcApplication.class, args);
-		System.out.println("windows changed to ubuntu 2nd time--////.///");
+		System.out.println("windows updated changed to ubuntu 2nd time--////.///");
 	}
 
 }
