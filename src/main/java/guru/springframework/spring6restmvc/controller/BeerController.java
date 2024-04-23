@@ -31,22 +31,21 @@ public class BeerController {
 
     @DeleteMapping(value = BEER_URL_ID)
     public ResponseEntity deleteById(@PathVariable(BEER_ID)UUID id){
-        BeerDTO deletedBeer = beerService.deleteBeerById(id);
-        HttpHeaders headers = new HttpHeaders();
-        return new ResponseEntity(headers,HttpStatus.NO_CONTENT);
+        if(beerService.deleteBeerById(id)) {
+            HttpHeaders headers = new HttpHeaders();
+            return new ResponseEntity(headers, HttpStatus.NO_CONTENT);
+        }
+        else
+            throw new NotFoundException("Beer with id " + id + " not found");
 
     }
 
     @PutMapping(value = BEER_URL_ID)
     public ResponseEntity updateById(@PathVariable(BEER_ID) UUID id, @RequestBody BeerDTO beer){
-        BeerDTO savedBeer = beerService.updateBear(id,beer);
-        System.out.println("SAVEDBEAR:"+savedBeer);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Location",BEER_URL+beer.getId());
-        headers.add("2nd",BEER_URL+beer.getId());
-        headers.add("3rd",BEER_URL+beer.getId());
-        headers.add("Ocation",BEER_URL+beer.getId());
-        return new ResponseEntity(headers,HttpStatus.NO_CONTENT);
+        if(beerService.updateBear(id,beer).isEmpty())
+            throw new NotFoundException("Beer not found");
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
     @RequestMapping(value = BEER_URL_ID,method = RequestMethod.GET)
     public BeerDTO getBeerById(@PathVariable(BEER_ID) UUID beerId){
@@ -65,7 +64,7 @@ public class BeerController {
     public ResponseEntity handlePost(@RequestBody BeerDTO beer){
         BeerDTO savedBeed = beerService.saveNewBear(beer);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Location",BEER_URL+savedBeed.getId());
+        headers.add("Location",BEER_URL+"/"+savedBeed.getId());
         return new ResponseEntity(headers,HttpStatus.CREATED);
     }
 

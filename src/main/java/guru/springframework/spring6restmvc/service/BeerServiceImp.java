@@ -83,7 +83,7 @@ public class BeerServiceImp implements BeerService{
     }
 
     @Override
-    public BeerDTO updateBear(UUID id, BeerDTO beer) {
+    public Optional<BeerDTO> updateBear(UUID id, BeerDTO beer) {
         System.out.println("IIJIJIJIJIJIJIJIJIJI");
         System.out.println("beer: /3"+beer);
         BeerDTO exisitng = beerMap.get(id);
@@ -93,14 +93,16 @@ public class BeerServiceImp implements BeerService{
             exisitng.setPrice(beer.getPrice());
             exisitng.setVersion(beer.getVersion());
             exisitng.setUpc(beer.getUpc());
-            return beerMap.put(exisitng.getId(), exisitng);
+           // return beerMap.put(exisitng.getId(), exisitng);
         }
-       return beerMap.put(id,beer);
+        return Optional.of(exisitng);
+       //return beerMap.put(id,beer);
     }
 
     @Override
-    public BeerDTO deleteBeerById(UUID id) {
-         return beerMap.remove(id);
+    public boolean deleteBeerById(UUID id) {
+          beerMap.remove(id);
+          return true;
     }
 
     @Override

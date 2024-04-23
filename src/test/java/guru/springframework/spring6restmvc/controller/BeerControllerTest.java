@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import guru.springframework.spring6restmvc.model.BeerDTO;
 import guru.springframework.spring6restmvc.service.BeerService;
 import guru.springframework.spring6restmvc.service.BeerServiceImp;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -115,12 +116,12 @@ class BeerControllerTest {
     void testUpdateBeer() throws Exception {
         BeerDTO beer = beerServiceImp.listBeers().get(0);
         System.out.println(beer);
+        given(beerService.updateBear(any(),any())).willReturn(Optional.of(beer));
         ResultActions resultActions = mockMvc.perform(put(BEER_URL_ID , beer.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beer)))
-                .andExpect(status().isNoContent())
-                .andExpect(header().exists("Location"));
+                .andExpect(status().isNoContent());
 
         List<String> collect = resultActions.andReturn().getResponse().getHeaderNames().stream().collect(Collectors.toList());
         collect.forEach(System.out::println);
@@ -131,6 +132,7 @@ class BeerControllerTest {
     @Test
     void testDeleteBeer() throws Exception{
         BeerDTO beer = beerServiceImp.listBeers().get(0);
+        given(beerService.deleteBeerById(any())).willReturn(true);
         mockMvc.perform(delete(BEER_URL_ID , beer.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -147,6 +149,7 @@ class BeerControllerTest {
         BeerDTO beer = beerServiceImp.listBeers().get(0);
         Map<String,Object> beerMap = new HashMap<>();
         beerMap.put("beerName","New Name");
+
         mockMvc.perform(patch(BEER_URL_ID , beer.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
