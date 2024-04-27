@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import static guru.springframework.spring6restmvc.constants.RESTConstants.*;
 public class BeerController {
     private final BeerService beerService;
     @PatchMapping(value = BEER_URL_ID)
-    public ResponseEntity updateBeerPatchById(@PathVariable(BEER_ID) UUID id, @RequestBody BeerDTO beer){
+    public ResponseEntity updateBeerPatchById( @PathVariable(BEER_ID) UUID id, @RequestBody BeerDTO beer){
         beerService.patchBeerById(id,beer);
         HttpHeaders headers = new HttpHeaders();
         return new ResponseEntity(headers,HttpStatus.NO_CONTENT);
@@ -61,7 +62,8 @@ public class BeerController {
     }
     @PostMapping(value = BEER_URL)
     //@RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity handlePost(@RequestBody BeerDTO beer){
+    public ResponseEntity handlePost(@Validated @RequestBody BeerDTO beer){
+        System.out.println(beer);
         BeerDTO savedBeed = beerService.saveNewBear(beer);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location",BEER_URL+"/"+savedBeed.getId());
