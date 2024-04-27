@@ -33,7 +33,7 @@ class BeerRepositoryTest {
     void testSavedBeerLength(){
         assertThrows(ConstraintViolationException.class ,()-> {
             Beer savedBeer = beerRepository.save(Beer.builder()
-                    .beerName("Beer11111111111111111111111111111111111111111111111111111111111111111111111111111111")
+                    .beerName("Beer11111111111111111111111111111111111111111111Beer11111111111111111111111111111111111111111111Beer11111111111111111111111111111111111111111111Beer11111111111111111111111111111111111111111111")
                     .beerStyle(BeerStyle.PALE_ALE)
                     .price(new BigDecimal("11.0"))
                     .upc("KOL").build());

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,6 +65,8 @@ public class BeerController {
     //@RequestMapping(method = RequestMethod.POST)
     public ResponseEntity handlePost(@Validated @RequestBody BeerDTO beer){
         System.out.println(beer);
+        beer.setUpdateDate(LocalDateTime.now());
+        beer.setCreatedDate(LocalDateTime.now());
         BeerDTO savedBeed = beerService.saveNewBear(beer);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location",BEER_URL+"/"+savedBeed.getId());
