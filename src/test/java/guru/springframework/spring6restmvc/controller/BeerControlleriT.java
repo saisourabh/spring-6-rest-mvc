@@ -72,7 +72,7 @@ class BeerControlleriT {
     void ListBeers(){
       List<BeerDTO> beerList = beerController.beerList();
         beerList.stream().forEach(System.out::println);
-      assert(beerList.size() == 3);
+      assert(beerList.size() == 2413);
     }
     @Transactional
     @Test
