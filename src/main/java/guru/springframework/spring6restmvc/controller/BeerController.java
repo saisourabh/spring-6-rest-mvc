@@ -2,6 +2,7 @@ package guru.springframework.spring6restmvc.controller;
 
 import guru.springframework.spring6restmvc.NotFoundException;
 import guru.springframework.spring6restmvc.model.BeerDTO;
+import guru.springframework.spring6restmvc.model.BeerStyle;
 import guru.springframework.spring6restmvc.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,9 +58,10 @@ public class BeerController {
         return beerService.getBeerById(beerId).orElseThrow(NotFoundException::new);
     }
     @RequestMapping(value = BEER_URL,method = RequestMethod.GET)
-    public List<BeerDTO> beerList(){
+    public List<BeerDTO> beerList(@RequestParam(required = false) String beerName, @RequestParam(required = false) BeerStyle beerStyle, @RequestParam(required = false)Boolean showInventory){
         log.debug("Get Beer by Id - controller");
-        return beerService.listBeers();
+        return beerService.listBeers(beerName, beerStyle, showInventory);
+       // return beerService.listBeers().stream().filter(beer -> beer.getBeerName().equals(beerName)).collect(Collectors.toList());
     }
     @PostMapping(value = BEER_URL)
     //@RequestMapping(method = RequestMethod.POST)
