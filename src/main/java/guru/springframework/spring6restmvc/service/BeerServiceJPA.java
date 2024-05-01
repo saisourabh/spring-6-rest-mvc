@@ -102,6 +102,8 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public Optional<BeerDTO> updateBear(UUID id, BeerDTO beer) {
+//        System.out.println("found "+beerRepository.findById(beer.getId()).get().getBeerName()+" ");
+//        return Optional.of(beerMapper.beerToBeerDTO(beerRepository.saveAndFlush(beerMapper.beerDTOToBeer(beer))));
         AtomicReference<Optional<BeerDTO>> automocReference = new AtomicReference();
         beerRepository.findById(id).ifPresentOrElse(foundBeer -> {
             foundBeer.setBeerName(beer.getBeerName());
