@@ -6,6 +6,7 @@ import guru.springframework.spring6restmvc.model.BeerStyle;
 import guru.springframework.spring6restmvc.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import static guru.springframework.spring6restmvc.constants.RESTConstants.*;
@@ -23,6 +23,9 @@ import static guru.springframework.spring6restmvc.constants.RESTConstants.*;
 @RestController
 //@RequestMapping(BEER_URL)
 public class BeerController {
+    public static final String BEER_PATH = "/api/v1/beer";
+    public static final String BEER_PATH_ID = BEER_PATH + "/{beerId}";
+
     private final BeerService beerService;
     @PatchMapping(value = BEER_URL_ID)
     public ResponseEntity updateBeerPatchById( @PathVariable(BEER_ID) UUID id, @RequestBody BeerDTO beer){
@@ -58,9 +61,13 @@ public class BeerController {
         return beerService.getBeerById(beerId).orElseThrow(NotFoundException::new);
     }
     @RequestMapping(value = BEER_URL,method = RequestMethod.GET)
-    public List<BeerDTO> beerList(@RequestParam(required = false) String beerName, @RequestParam(required = false) BeerStyle beerStyle, @RequestParam(required = false)Boolean showInventory){
+    public Page<BeerDTO> beerList(@RequestParam(required = false) String beerName,
+                                  @RequestParam(required = false) BeerStyle beerStyle,
+                                  @RequestParam(required = false) Boolean showInventory,
+                                  @RequestParam(required = false) Integer pageNumber,
+                                  @RequestParam(required = false) Integer pageSize){
         log.debug("Get Beer by Id - controller");
-        return beerService.listBeers(beerName, beerStyle, showInventory);
+        return beerService.listBeers(beerName, beerStyle, showInventory, pageNumber, pageSize);
        // return beerService.listBeers().stream().filter(beer -> beer.getBeerName().equals(beerName)).collect(Collectors.toList());
     }
     @PostMapping(value = BEER_URL)
