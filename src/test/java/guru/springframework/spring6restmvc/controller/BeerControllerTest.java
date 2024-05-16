@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -56,6 +57,17 @@ class BeerControllerTest {
     @Captor
     ArgumentCaptor<UUID> uuidArgumentCaptor;
 
+    public static final SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor jwtRequestPostProcessor = jwt().jwt(jwt -> {
+                jwt.claims(claims -> {
+                            claims.put("scope", "message.read");
+                            claims.put("scope", "message.write");
+                        })
+                        .subject("messaging-client")
+                        .notBefore(Instant.now().minusSeconds(5l));
+            }
+    );
+
+
     @BeforeEach
     void setUp() {
         beerServiceImp = new BeerServiceImp();
@@ -68,15 +80,8 @@ class BeerControllerTest {
         BeerDTO testBeer = beerServiceImp.listBeers(null, null, false, 1, 25).stream().findFirst().orElse(null);
         given(beerService.getBeerById(testBeer.getId())).willReturn(Optional.of(testBeer));
         ResultActions resultActions = mockMvc.perform(get(BEER_URL_ID, testBeer.getId())
-                        .with(jwt().jwt(jwt -> {
-                                    jwt.claims(claims -> {
-                                                claims.put("scope", "message.read");
-                                                claims.put("scope", "message.write");
-                                            })
-                                            .subject("messaging-client")
-                                            .notBefore(Instant.now().minusSeconds(5l));
-                                }
-                        ))                        .accept(MediaType.APPLICATION_JSON))
+                        .with(jwtRequestPostProcessor)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testBeer.getId().toString())))
@@ -90,15 +95,7 @@ class BeerControllerTest {
     @Test
     void getBeerById1() throws Exception {
         mockMvc.perform(get(BEER_URL_ID, UUID.randomUUID())
-                        .with(jwt().jwt(jwt -> {
-                                    jwt.claims(claims -> {
-                                                claims.put("scope", "message.read");
-                                                claims.put("scope", "message.write");
-                                            })
-                                            .subject("messaging-client")
-                                            .notBefore(Instant.now().minusSeconds(5l));
-                                }
-                        ))
+                        .with( jwtRequestPostProcessor)
                         .accept(MediaType.APPLICATION_JSON))
                 //.andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -110,15 +107,7 @@ class BeerControllerTest {
         given(beerService.listBeers(any(), any() , any(), any(), any())).willReturn(beerServiceImp.listBeers(null, null, false, 1, 25));
 
         mockMvc.perform(get(BEER_URL)
-                        .with(jwt().jwt(jwt -> {
-                                    jwt.claims(claims -> {
-                                                claims.put("scope", "message.read");
-                                                claims.put("scope", "message.write");
-                                            })
-                                            .subject("messaging-client")
-                                            .notBefore(Instant.now().minusSeconds(5l));
-                                }
-                        ))
+                        .with(jwtRequestPostProcessor)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -136,15 +125,7 @@ class BeerControllerTest {
         given(beerService.saveNewBear(any(BeerDTO.class))).willReturn(beerServiceImp.listBeers(null, null, false, 1, 25).stream().findFirst().orElse(null));
 
         mockMvc.perform(post(BEER_URL)
-                        .with(jwt().jwt(jwt -> {
-                                    jwt.claims(claims -> {
-                                                claims.put("scope", "message.read");
-                                                claims.put("scope", "message.write");
-                                            })
-                                            .subject("messaging-client")
-                                            .notBefore(Instant.now().minusSeconds(5l));
-                                }
-                        ))
+                        .with(jwtRequestPostProcessor)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beer)))
@@ -161,15 +142,7 @@ class BeerControllerTest {
         given(beerService.saveNewBear(any(BeerDTO.class))).willReturn(beerServiceImp.listBeers(null, null, false, 1, 25).stream().findFirst().orElse(null));
 
         MvcResult mvcResult = mockMvc.perform(post(BEER_URL)
-                        .with(jwt().jwt(jwt -> {
-                                    jwt.claims(claims -> {
-                                                claims.put("scope", "message.read");
-                                                claims.put("scope", "message.write");
-                                            })
-                                            .subject("messaging-client")
-                                            .notBefore(Instant.now().minusSeconds(5l));
-                                }
-                                ))
+                        .with(jwtRequestPostProcessor)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beer)))
@@ -185,15 +158,7 @@ class BeerControllerTest {
         System.out.println(beer);
         given(beerService.updateBear(any(), any())).willReturn(Optional.of(beer));
         ResultActions resultActions = mockMvc.perform(put(BEER_URL_ID, beer.getId())
-                        .with(jwt().jwt(jwt -> {
-                                    jwt.claims(claims -> {
-                                                claims.put("scope", "message.read");
-                                                claims.put("scope", "message.write");
-                                            })
-                                            .subject("messaging-client")
-                                            .notBefore(Instant.now().minusSeconds(5l));
-                                }
-                        ))
+                        .with(jwtRequestPostProcessor)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beer)))
@@ -211,15 +176,7 @@ class BeerControllerTest {
         BeerDTO beer = beerServiceImp.listBeers(null, null, false, 1, 25).stream().findFirst().orElse(null);
         given(beerService.deleteBeerById(any())).willReturn(true);
         mockMvc.perform(delete(BEER_URL_ID, beer.getId())
-                        .with(jwt().jwt(jwt -> {
-                                    jwt.claims(claims -> {
-                                                claims.put("scope", "message.read");
-                                                claims.put("scope", "message.write");
-                                            })
-                                            .subject("messaging-client")
-                                            .notBefore(Instant.now().minusSeconds(5l));
-                                }
-                        ))
+                        .with(jwtRequestPostProcessor)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -237,15 +194,7 @@ class BeerControllerTest {
         beerMap.put("beerName", "New Name");
 
         mockMvc.perform(patch(BEER_URL_ID, beer.getId())
-                        .with(jwt().jwt(jwt -> {
-                                    jwt.claims(claims -> {
-                                                claims.put("scope", "message.read");
-                                                claims.put("scope", "message.write");
-                                            })
-                                            .subject("messaging-client")
-                                            .notBefore(Instant.now().minusSeconds(5l));
-                                }
-                        ))
+                        .with(jwtRequestPostProcessor)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beer)))
@@ -261,15 +210,7 @@ class BeerControllerTest {
     void NotFoundException() throws Exception {
         given(beerService.getBeerById(any(UUID.class))).willReturn(Optional.empty());
         mockMvc.perform(get(BEER_URL_ID, UUID.randomUUID())
-                        .with(jwt().jwt(jwt -> {
-                                    jwt.claims(claims -> {
-                                                claims.put("scope", "message.read");
-                                                claims.put("scope", "message.write");
-                                            })
-                                            .subject("messaging-client")
-                                            .notBefore(Instant.now().minusSeconds(5l));
-                                }
-                        )))
+                        .with(jwtRequestPostProcessor))
                 .andExpect(status().isNotFound());
     }
 }
